@@ -115,7 +115,6 @@ def results(election_id):
 
     return render_template('results.html', election=election, labels=labels, data=data)
 
-
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin_panel():
