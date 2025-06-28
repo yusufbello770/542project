@@ -1,23 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <h2>{{ election.title }}</h2>
 <p>{{ election.description }}</p>
+<p><strong>Start:</strong> {{ election.start_time }} | <strong>End:</strong> {{ election.end_time }}</p>
+
+<hr>
 
 <h4>Candidates:</h4>
+
+{% if candidates %}
 <ul class="list-group">
     {% for candidate in candidates %}
         <li class="list-group-item">
-            {{ candidate.name }} - {{ candidate.party }}
+            <strong>{{ candidate.name }}</strong> 
+            {% if candidate.party %}
+                - {{ candidate.party }}
+            {% endif %}
+            {% if candidate.position %}
+                <span class="text-muted">({{ candidate.position }})</span>
+            {% endif %}
         </li>
-    {% else %}
-        <p>No candidates yet for this election.</p>
     {% endfor %}
 </ul>
-
-<a href="{{ url_for('vote', election_id=election.election_id) }}" class="btn btn-success mt-3">Vote Now</a>
-<a href="{{ url_for('results', election_id=election.election_id) }}" class="btn btn-primary mt-3">View Results</a>
-
-{% if current_user.role == 'admin' %}
-    <a href="{{ url_for('add_candidate', election_id=election.election_id) }}" class="btn btn-warning mt-3">Add Candidate</a>
+{% else %}
+    <p class="mt-2">🚫 No candidates yet for this election.</p>
 {% endif %}
+
+<hr>
+
+<div class="mt-3">
+    <a href="{{ url_for('vote', election_id=election.election_id) }}" class="btn btn-success">
+        🗳️ Vote Now
+    </a>
+    <a href="{{ url_for('results', election_id=election.election_id) }}" class="btn btn-primary">
+        📊 View Results
+    </a>
+
+    {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('add_candidate', election_id=election.election_id) }}" class="btn btn-warning">
+            ➕ Add Candidate
+        </a>
+    {% endif %}
+</div>
+
 {% endblock %}
