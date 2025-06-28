@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <h1>Admin Panel</h1>
 
@@ -20,7 +21,7 @@
         <label>End Time:</label>
         <input type="datetime-local" name="end_time" class="form-control" required>
     </div>
-    <button type="submit" class="btn btn-primary">Create Election</button>
+    <button type="submit" class="btn btn-primary">➕ Create Election</button>
 </form>
 
 <hr>
@@ -29,7 +30,19 @@
 <ul class="list-group">
     {% for election in elections %}
         <li class="list-group-item">
-            {{ election.title }} ({{ election.status }})
+            <strong>{{ election.title }}</strong> ({{ election.status }})<br>
+            <small>From: {{ election.start_time }} To: {{ election.end_time }}</small><br><br>
+
+            <!-- Buttons -->
+            <a href="{{ url_for('add_candidate', election_id=election.election_id) }}" class="btn btn-sm btn-primary">
+                ➕ Add Candidate
+            </a>
+            <a href="{{ url_for('election_detail', election_id=election.election_id) }}" class="btn btn-sm btn-success">
+                👀 View Candidates
+            </a>
+            <a href="{{ url_for('results', election_id=election.election_id) }}" class="btn btn-sm btn-warning">
+                📊 View Results
+            </a>
         </li>
     {% else %}
         <p>No elections yet.</p>
