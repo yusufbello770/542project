@@ -1,9 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Results for: {{ election.title }}</h2>
 
-{% if labels and data %}
+<h2>📊 Results for: {{ election.title }}</h2>
+
+{% if labels and data and data | sum > 0 %}
+
+<!-- Chart Display -->
 <canvas id="resultsChart" width="400" height="200"></canvas>
+
+<!-- Results Table -->
+<table class="table table-bordered mt-4">
+    <thead>
+        <tr>
+            <th>Candidate</th>
+            <th>Votes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for label, count in labels|zip(data) %}
+        <tr>
+            <td>{{ label }}</td>
+            <td>{{ count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <script>
     const ctx = document.getElementById('resultsChart').getContext('2d');
@@ -14,8 +35,22 @@
             datasets: [{
                 label: 'Vote Count',
                 data: {{ data | tojson | safe }},
-                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
                 borderWidth: 1
             }]
         },
@@ -25,15 +60,19 @@
                 y: {
                     beginAtZero: true,
                     precision: 0,
-                    stepSize: 1
+                    ticks: {
+                        stepSize: 1
+                    }
                 }
             }
         }
     });
 </script>
+
 {% else %}
-<p>No votes cast yet for this election.</p>
+<p class="mt-3">🚫 No votes have been cast yet for this election.</p>
 {% endif %}
 
-<a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+<a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-4">🏠 Back to Dashboard</a>
+
 {% endblock %}
