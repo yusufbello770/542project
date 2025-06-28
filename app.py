@@ -6,18 +6,16 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
-app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///voting.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
-login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
 
+# ------------------ Models ------------------
 class User(UserMixin, db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100), nullable=False)
@@ -52,14 +50,17 @@ class Vote(db.Model):
     election_id = db.Column(db.Integer, db.ForeignKey('election.election_id'), nullable=False)
     candidate_id = db.Column(db.Integer, db.ForeignKey('candidate.candidate_id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
     __table_args__ = (db.UniqueConstraint('voter_id', 'election_id', name='unique_vote'),)
 
 
+# ------------------ Login Manager ------------------
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+# ------------------ Routes ------------------
 @app.route('/')
 @login_required
 def dashboard():
@@ -229,45 +230,46 @@ def logout():
     return redirect(url_for('login'))
 
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+# ------------------ DB Initialization ------------------
+with app.app_context():
+    db.create_all()
 
-        admin_email = 'admin@example.com'
-        admin = User.query.filter_by(email=admin_email).first()
-        if not admin:
-            admin = User(
-                full_name="Admin User",
-                email=admin_email,
-                password=generate_password_hash('admin12345'),
-                role="admin"
+    # Create default admin
+    admin_email = 'admin@example.com'
+    admin = User.query.filter_by(email=admin_email).first()
+    if not admin:
+        admin = User(
+            full_name="Admin User",
+            email=admin_email,
+            password=generate_password_hash('admin12345'),
+            role="admin"
+        )
+        db.session.add(admin)
+        print('✅ Admin user created: admin@example.com / admin12345')
+
+    # Create dummy voters
+    dummy_voters = [
+        {"name": "John Doe", "email": "john@example.com", "password": "john123"},
+        {"name": "Jane Smith", "email": "jane@example.com", "password": "jane123"},
+        {"name": "Michael Brown", "email": "michael@example.com", "password": "michael123"},
+    ]
+
+    for voter in dummy_voters:
+        existing = User.query.filter_by(email=voter['email']).first()
+        if not existing:
+            new_voter = User(
+                full_name=voter['name'],
+                email=voter['email'],
+                password=generate_password_hash(voter['password']),
+                role="voter"
             )
-            db.session.add(admin)
-            print('✅ Admin user created: admin@example.com / admin123')
+            db.session.add(new_voter)
+            print(f"✅ Voter created: {voter['email']} / {voter['password']}")
 
-        dummy_voters = [
-            {"name": "John Doe", "email": "john@example.com", "password": "john123"},
-            {"name": "Jane Smith", "email": "jane@example.com", "password": "jane123"},
-            {"name": "Michael Brown", "email": "michael@example.com", "password": "michael123"},
-        ]
+    db.session.commit()
 
-        for voter in dummy_voters:
-            existing = User.query.filter_by(email=voter['email']).first()
-            if not existing:
-                new_voter = User(
-                    full_name=voter['name'],
-                    email=voter['email'],
-                    password=generate_password_hash(voter['password']),
-                    role="voter"
-                )
-                db.session.add(new_voter)
-                print(f"✅ Voter created: {voter['email']} / {voter['password']}")
 
-        db.session.commit()
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+# ------------------ Run App ------------------
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
