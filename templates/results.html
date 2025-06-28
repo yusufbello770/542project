@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Results for: {{ election.title }}</h2>
+
+{% if labels and data %}
+<canvas id="resultsChart" width="400" height="200"></canvas>
+
+<script>
+    const ctx = document.getElementById('resultsChart').getContext('2d');
+    const resultsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels | tojson | safe }},
+            datasets: [{
+                label: 'Vote Count',
+                data: {{ data | tojson | safe }},
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    precision: 0,
+                    stepSize: 1
+                }
+            }
+        }
+    });
+</script>
+{% else %}
+<p>No votes cast yet for this election.</p>
+{% endif %}
+
+<a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+{% endblock %}

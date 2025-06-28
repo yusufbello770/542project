@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Add Candidate for {{ election.title }}</h2>
+
+<form method="POST">
+    <div class="mb-3">
+        <label>Candidate Name:</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>Party:</label>
+        <input type="text" name="party" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Position:</label>
+        <input type="text" name="position" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-success">Add Candidate</button>
+</form>
+
+<a href="{{ url_for('election_detail', election_id=election.election_id) }}" class="btn btn-secondary mt-3">Back to Election</a>
+{% endblock %}

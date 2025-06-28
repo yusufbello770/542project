@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Welcome {{ current_user.full_name }}!</h2>
+<p>Your Role: {{ current_user.role }}</p>
+<a href="{{ url_for('logout') }}" class="btn btn-danger mb-3">Logout</a>
+
+<h4>Available Elections:</h4>
+<ul class="list-group">
+    {% for election in elections %}
+        <li class="list-group-item">
+            <strong>{{ election.title }}</strong>
+            <div>
+                <a href="{{ url_for('election_detail', election_id=election.election_id) }}" class="btn btn-sm btn-info mt-2">View</a>
+                <a href="{{ url_for('vote', election_id=election.election_id) }}" class="btn btn-sm btn-success mt-2">Vote</a>
+                <a href="{{ url_for('results', election_id=election.election_id) }}" class="btn btn-sm btn-primary mt-2">Results</a>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+
+{% if current_user.role == 'admin' %}
+<hr>
+<a href="{{ url_for('admin_panel') }}" class="btn btn-warning">Go to Admin Panel</a>
+{% endif %}
+{% endblock %}

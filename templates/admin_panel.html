@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Admin Panel</h1>
+
+<h4>Create New Election</h4>
+<form method="POST">
+    <div class="mb-3">
+        <label>Title:</label>
+        <input type="text" name="title" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>Description:</label>
+        <textarea name="description" class="form-control"></textarea>
+    </div>
+    <div class="mb-3">
+        <label>Start Time:</label>
+        <input type="datetime-local" name="start_time" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>End Time:</label>
+        <input type="datetime-local" name="end_time" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Create Election</button>
+</form>
+
+<hr>
+
+<h4>Existing Elections</h4>
+<ul class="list-group">
+    {% for election in elections %}
+        <li class="list-group-item">
+            {{ election.title }} ({{ election.status }})
+        </li>
+    {% else %}
+        <p>No elections yet.</p>
+    {% endfor %}
+</ul>
+{% endblock %}

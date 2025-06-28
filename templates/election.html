@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ election.title }}</h2>
+<p>{{ election.description }}</p>
+
+<h4>Candidates:</h4>
+<ul class="list-group">
+    {% for candidate in candidates %}
+        <li class="list-group-item">
+            {{ candidate.name }} - {{ candidate.party }}
+        </li>
+    {% else %}
+        <p>No candidates yet for this election.</p>
+    {% endfor %}
+</ul>
+
+<a href="{{ url_for('vote', election_id=election.election_id) }}" class="btn btn-success mt-3">Vote Now</a>
+<a href="{{ url_for('results', election_id=election.election_id) }}" class="btn btn-primary mt-3">View Results</a>
+
+{% if current_user.role == 'admin' %}
+    <a href="{{ url_for('add_candidate', election_id=election.election_id) }}" class="btn btn-warning mt-3">Add Candidate</a>
+{% endif %}
+{% endblock %}

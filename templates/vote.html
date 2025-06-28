@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Vote in Election ID: {{ election_id }}</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label>Select Candidate:</label><br>
+        {% for candidate in candidates %}
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="candidate_id" value="{{ candidate.candidate_id }}" required>
+                <label class="form-check-label">
+                    {{ candidate.name }} ({{ candidate.party }})
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-success">Submit Vote</button>
+</form>
+{% endblock %}
